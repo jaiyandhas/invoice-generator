@@ -1,0 +1,95 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 960px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+    background-color: #f9fafb;
+    font-weight: 500;
+}
+
+.btn {
+    padding: 8px 16px;
+    margin: 4px 2px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #303f9f;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.invoice-header {
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.text-right {
+    text-align: right;
+}
