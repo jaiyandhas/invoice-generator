@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - Print View{% endblock %}
+
+{% block content %}
+<div class="container printable-invoice mt-4">
+    <!-- Invoice Header -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="display-4">INVOICE</h1>
+            <div class="invoice-meta">
+                <p><strong>Invoice #:</strong> {{ invoice.invoice_number }}</p>
+                <p><strong>Date Issued:</strong> {{ invoice.issue_date.strftime('%B %d, %Y') }}</p>
+                <p><strong>Due Date:</strong> {{ invoice.due_date.strftime('%B %d, %Y') }}</p>
+                {% if invoice.status == 'PAID' %}
+                    <p><strong>Payment Date:</strong> {{ invoice.payment_date.strftime('%B %d, %Y') }}</p>
+                {% endif %}
+                <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if invoice.status == 'PAID' else 'warning' }}">{{ invoice.status }}</span></p>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            {% if invoice.customer %}
+            <div class="customer-info">
+                <h3>Bill To:</h3>
+                <p class="mb-1"><strong>{{ invoice.customer.name }}</strong></p>
+                {% if invoice.customer.address %}
+                    <p class="mb-1">{{ invoice.customer.address }}</p>
+                {% endif %}
+                {% if invoice.customer.email %}
+                    <p class="mb-1">{{ invoice.customer.email }}</p>
+                {% endif %}
+                {% if invoice.customer.phone %}
+                    <p class="mb-1">{{ invoice.customer.phone }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.items %}
+                    <tr>
+                        <td>{{ item.description }}</td>
+                        <td class="text-end">{{ item.quantity }}</td>
+                        <td class="text-end">${{ "%.2f"|format(item.unit_price) }}</td>
+                        <td class="text-end">${{ "%.2f"|format(item.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="row justify-content-end">
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                <tr>
+                    <td><strong>Subtotal:</strong></td>
+                    <td class="text-end">${{ "%.2f"|format(invoice.subtotal) }}</td>
+                </tr>
+                {% if invoice.tax_rate > 0 %}
+                <tr>
+                    <td><strong>Tax ({{ invoice.tax_rate }}%):</strong></td>
+                    <td class="text-end">${{ "%.2f"|format(invoice.tax_amount) }}</td>
+                </tr>
+                {% endif %}
+                <tr class="table-active">
+                    <td><strong>Total:</strong></td>
+                    <td class="text-end"><strong>${{ "%.2f"|format(invoice.total) }}</strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Notes and Terms -->
+    {% if invoice.notes or invoice.terms %}
+    <div class="row mt-4">
+        {% if invoice.notes %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Notes</strong>
+                </div>
+                <div class="card-body">
+                    {{ invoice.notes|replace('\n', '<br>')|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if invoice.terms %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Terms & Conditions</strong>
+                </div>
+                <div class="card-body">
+                    {{ invoice.terms|replace('\n', '<br>')|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <p class="text-muted">Thank you for your business!</p>
+            <p class="text-muted small">{{ config.APP_NAME }} &copy; {{ now.year }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="no-print text-center mt-3">
+    <button onclick="window.print()" class="btn btn-primary">
+        <i class="fas fa-print"></i> Print Invoice
+    </button>
+    <a href="{{ url_for('invoices.download_pdf', id=invoice.id) }}" class="btn btn-success ms-2">
+        <i class="fas fa-file-pdf"></i> Download PDF
+    </a>
+    <a href="{{ url_for('invoices.view_invoice', id=invoice.id) }}" class="btn btn-secondary ms-2">
+        <i class="fas fa-arrow-left"></i> Back to Invoice
+    </a>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+@media print {
+    body {
+        background: white !important;
+        font-size: 12pt;
+    }
+    .printable-invoice {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .no-print, .no-print * {
+        display: none !important;
+    }
+    .table {
+        page-break-inside: avoid;
+    }
+    .badge {
+        color: black !important;
+        background-color: transparent !important;
+        border: 1px solid black;
+    }
+    .card {
+        border: 1px solid #ddd;
+        background-color: transparent !important;
+    }
+    .table-active {
+        background-color: rgba(0,0,0,0.05) !important;
+    }
+}
+
+@media screen {
+    .printable-invoice {
+        background: white;
+        padding: 2rem;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-print dialog when page loads (optional)
+window.addEventListener('DOMContentLoaded', (event) => {
+    if (window.location.search.includes('autoprint')) {
+        window.print();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Create Invoice{% endblock %}
+
+{% block content %}
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 text-primary">
+            <i class="fas fa-file-invoice me-2"></i>Create New Invoice
+        </h2>
+        <a href="{{ url_for('invoices.list_invoices') }}" class="btn btn-outline-secondary rounded-pill">
+            <i class="fas fa-arrow-left me-1"></i> Back to Invoices
+        </a>
+    </div>
+
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <!-- Customer Info -->
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Customer</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    {{ form.customer_id.label(class="form-label fw-bold") }}
+                    {{ form.customer_id(class="form-select" + (' is-invalid' if form.customer_id.errors else '')) }}
+                    {% if form.customer_id.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.customer_id.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted mt-2">
+                        Can’t find your customer? <a href="{{ url_for('customers.list_customers') }}" class="text-primary fw-bold">Add a new customer</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="card mb-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="far fa-calendar-alt me-2"></i>Invoice Dates</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.issue_date.label(class="form-label fw-bold") }}
+                        {{ form.issue_date(class="form-control") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.due_date.label(class="form-label fw-bold") }}
+                        {{ form.due_date(class="form-control") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Items -->
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>Items</h5>
+                <button type="button" id="add-item" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus me-1"></i> Add Item
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="items-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" name="description" class="form-control form-control-sm" required></td>
+                                <td><input type="number" name="quantity" class="form-control form-control-sm calc-total" step="0.01" required></td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" name="unit_price" class="form-control calc-total" step="0.01" required>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" name="amount" class="form-control" readonly>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-row">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="card mb-4 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Totals</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.tax_rate.label(class="form-label fw-bold") }}
+                        <div class="input-group">
+                            {{ form.tax_rate(class="form-control", id="tax_rate") }}
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row mb-3">
+                            <div class="col-6">{{ form.subtotal.label(class="form-label fw-bold") }}</div>
+                            <div class="col-6 text-end">
+                                {{ form.subtotal(class="form-control-plaintext text-end fw-bold", id="subtotal", readonly=True) }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">{{ form.tax_amount.label(class="form-label fw-bold") }}</div>
+                            <div class="col-6 text-end">
+                                {{ form.tax_amount(class="form-control-plaintext text-end fw-bold", id="tax_amount", readonly=True) }}
+                            </div>
+                        </div>
+                        <div class="row border-top pt-3">
+                            <div class="col-6">{{ form.total.label(class="form-label fw-bold h5") }}</div>
+                            <div class="col-6 text-end">
+                                {{ form.total(class="form-control-plaintext text-end fw-bold h5 text-success", id="total", readonly=True) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="card mb-4 border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="far fa-comment-dots me-2"></i>Notes</h5>
+            </div>
+            <div class="card-body">
+                {{ form.notes.label(class="form-label fw-bold") }}
+                {{ form.notes(class="form-control", rows=3) }}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="reset" class="btn btn-outline-danger rounded-pill">
+                <i class="fas fa-undo me-1"></i> Reset
+            </button>
+            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-save me-1"></i> Save Invoice
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateInvoiceTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('[name="amount"]').forEach(input => {
+            subtotal += parseFloat(input.value) || 0;
+        });
+
+        const taxRate = parseFloat(document.getElementById('tax_rate').value) || 0;
+        const taxAmount = subtotal * (taxRate / 100);
+        const total = subtotal + taxAmount;
+
+        document.getElementById('subtotal').value = '$' + subtotal.toFixed(2);
+        document.getElementById('tax_amount').value = '$' + taxAmount.toFixed(2);
+        document.getElementById('total').value = '$' + total.toFixed(2);
+    }
+
+    function calculateRowTotal(row) {
+        const quantity = parseFloat(row.querySelector('[name="quantity"]').value) || 0;
+        const unitPrice = parseFloat(row.querySelector('[name="unit_price"]').value) || 0;
+        const amount = quantity * unitPrice;
+        row.querySelector('[name="amount"]').value = amount.toFixed(2);
+    }
+
+    function bindRowEvents(row) {
+        row.querySelectorAll('.calc-total').forEach(input => {
+            input.addEventListener('input', function () {
+                calculateRowTotal(row);
+                calculateInvoiceTotals();
+            });
+        });
+
+        row.querySelector('.remove-row').addEventListener('click', function () {
+            row.remove();
+            calculateInvoiceTotals();
+        });
+    }
+
+    // Existing row
+    document.querySelectorAll('#items-table tbody tr').forEach(bindRowEvents);
+
+    // Add new row
+    document.getElementById('add-item').addEventListener('click', function () {
+        const tbody = document.querySelector('#items-table tbody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" name="description" class="form-control form-control-sm" required></td>
+            <td><input type="number" name="quantity" class="form-control form-control-sm calc-total" step="0.01" required></td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">$</span>
+                    <input type="number" name="unit_price" class="form-control calc-total" step="0.01" required>
+                </div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">$</span>
+                    <input type="number" name="amount" class="form-control" readonly>
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-outline-danger btn-sm remove-row">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(newRow);
+        bindRowEvents(newRow);
+    });
+
+    // Tax rate change
+    document.getElementById('tax_rate').addEventListener('input', calculateInvoiceTotals);
+
+    // Initial calc
+    calculateInvoiceTotals();
+});
+</script>
+{% endblock %}

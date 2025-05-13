@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Customer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow" style="border: none; border-radius: 12px;">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #e63946, #c1121f); border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Create New Customer
+                </h4>
+            </div>
+            <div class="card-body" style="background-color: #ffffff;">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <!-- Name Field -->
+                    <div class="mb-4">
+                        {{ form.name.label(class="form-label fw-bold", style="color: #c1121f;") }}
+                        {{ form.name(class="form-control rounded-pill" + (' is-invalid' if form.name.errors else ''), 
+                                   style="border-color: #e63946; background-color: #fffafa;") }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback" style="color: #e63946;">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text" style="color: #e63946;">Customer's full name or business name</small>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-4">
+                        {{ form.email.label(class="form-label fw-bold", style="color: #c1121f;") }}
+                        {{ form.email(class="form-control rounded-pill" + (' is-invalid' if form.email.errors else ''), 
+                                    type="email", style="border-color: #e63946; background-color: #fffafa;") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback" style="color: #e63946;">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Field -->
+                    <div class="mb-4">
+                        {{ form.phone.label(class="form-label fw-bold", style="color: #c1121f;") }}
+                        {{ form.phone(class="form-control rounded-pill", type="tel", 
+                                    style="border-color: #e63946; background-color: #fffafa;") }}
+                        <small class="form-text" style="color: #e63946;">Format: (123) 456-7890</small>
+                    </div>
+
+                    <!-- Address Field -->
+                    <div class="mb-4">
+                        {{ form.address.label(class="form-label fw-bold", style="color: #c1121f;") }}
+                        {{ form.address(class="form-control", rows="3", 
+                                      style="border-color: #e63946; background-color: #fffafa; border-radius: 12px;") }}
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a href="{{ url_for('customers.list_customers') }}" 
+                           class="btn btn-outline-danger rounded-pill" 
+                           style="border-color: #e63946; color: #e63946;">
+                            <i class="fas fa-arrow-left me-1"></i> Back
+                        </a>
+                        <button type="submit" class="btn rounded-pill" 
+                                style="background: linear-gradient(135deg, #e63946, #c1121f); color: white; border: none;">
+                            <i class="fas fa-save me-1"></i> Save Customer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced phone number formatting
+    const phoneInput = document.querySelector('[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            const x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+
+    // Add focus effects
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 0 0.25rem rgba(230, 57, 70, 0.25)';
+        });
+        input.addEventListener('blur', function() {
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+</script>
+
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #e63946 !important;
+        box-shadow: 0 0 0 0.25rem rgba(230, 57, 70, 0.25) !important;
+    }
+
+    .btn, .form-control {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+    }
+</style>
+{% endblock %}
