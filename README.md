@@ -1,38 +1,54 @@
-# Invoice Generator System
+# 🧾 Simple Invoice Generator
 
-![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/flask-2.0+-green.svg)
-![License](https://img.shields.io/badge/license-MIT-orange.svg)
+A lightweight web-based Invoice Generator built using Python and Flask. This project was developed as a DBMS Mini Project to demonstrate real-world application of database modeling, form handling, and PDF generation.
 
-A web-based invoice generation system built with Flask that allows users to:
-- Create and manage customer records
-- Generate professional invoices with line items
-- Automatically calculate taxes and totals
-- Export invoices as PDF documents
-- Track invoice status (Draft/Paid/Overdue)
+---
 
-## Features
+## 📌 Project Objectives
 
-- **Customer Management**: Add, edit, and view customer information
-- **Invoice Creation**: 
-  - Dynamic line items with quantity/price calculations
-  - Automatic tax calculations
-  - Customizable invoice numbering
-- **PDF Generation**: Professional invoice templates
-- **Dashboard**: View all invoices with status indicators
-- **Search & Filter**: Find invoices by customer, date, or status
+- Manage customer and invoice data efficiently using a relational database
+- Dynamically generate professional invoices
+- Provide a simple, clean, and interactive user interface
+- Allow PDF download and printing of invoices
+- Apply real-world CRUD operations using Flask and SQLAlchemy
 
-## Technology Stack
+---
 
-- **Backend**: Python Flask
-- **Database**: SQLite (can be configured for MySQL/PostgreSQL)
-- **PDF Generation**: ReportLab
-- **Frontend**: Bootstrap 5, Jinja2 templates
-- **ORM**: SQLAlchemy
+## 🛠️ Technologies Used
 
-## Installation
+| Layer        | Tool/Library             | Purpose                                 |
+|-------------|---------------------------|-----------------------------------------|
+| Backend     | Python, Flask             | Server-side logic and routing           |
+| Frontend    | HTML, CSS, Bootstrap      | User interface and layout               |
+| Forms       | Flask-WTF, WTForms        | Form validation and input handling      |
+| Database    | SQLAlchemy (ORM)          | Object-relational database modeling     |
+| PDF Engine  | ReportLab                 | PDF invoice generation                  |
+| Templates   | Jinja2                    | Dynamic HTML rendering                  |
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/jaiyandhas/invoice-generator.git
-   cd invoice-generator
+---
+
+## 🗃️ Database Design
+
+- **Customer Table**: Stores customer info
+- **Invoice Table**: Stores invoice metadata (linked to customer)
+- **InvoiceItem Table**: Stores items in each invoice (linked to invoice)
+
+### 🔗 Relationships
+
+- One Customer → Many Invoices  
+- One Invoice → Many Invoice Items
+
+---
+
+## 🚀 Features
+
+- Create, read, update, and delete customers and invoices
+- Add multiple items per invoice with quantity, rate, and tax
+- Automatically calculate subtotal, tax, and total
+- Download professional PDF invoices
+- Dashboard with invoice status tracking
+
+---
+
+## 📂 Project Structure
+
